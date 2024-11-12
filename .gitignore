@@ -1,0 +1,32 @@
+# Node.js/Express backend (Backend-MERN)
+Backend-MERN/node_modules/
+Backend-MERN/.env
+Backend-MERN/dist/
+Backend-MERN/build/
+Backend-MERN/.eslintcache
+Backend-MERN/.vscode/
+
+# React frontend (Frontend-MERN/myapp)
+Frontend-MERN/myapp/node_modules/
+Frontend-MERN/myapp/.env
+Frontend-MERN/myapp/build/
+Frontend-MERN/myapp/.vscode/
+Frontend-MERN/myapp/.eslintcache
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# npm debug log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
