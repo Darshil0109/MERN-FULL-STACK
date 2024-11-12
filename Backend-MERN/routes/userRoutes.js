@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { User } = require('../models'); // Import models
 const router = express.Router();
-
+const upload = require('../multerConfig'); 
 // Get all users
 router.get('/', async (req, res) => {
   try {
@@ -14,9 +14,10 @@ router.get('/', async (req, res) => {
 });
 
 
-router.post('/', async (req, res) => {
-  const { username, email, password, profilePicture, bio } = req.body;
-
+router.post('/', upload.single('profilePicture'), async (req, res) => {
+  const { username, email, password,bio } = req.body;
+  const profilePicture = req.file ? req.file.filename : null;
+  
   // Basic validation
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Username, email, and password are required' });
