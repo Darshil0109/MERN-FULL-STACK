@@ -12,50 +12,83 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);  // req.params.id will get the 'id' from the URL
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
-router.post('/', upload.single('profilePicture'), async (req, res) => {
-  const { username, email, password,bio } = req.body;
+router.put('/:id', upload.single('profilePicture'), async (req, res) => {
+  const { username, email, password, bio } = req.body;
   const profilePicture = req.file ? req.file.filename : null;
-  
+
   // Basic validation
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: 'Username, email, and password are required' });
+  if (!username || !email) {
+    return res.status(400).json({ message: 'Username and email are required' });
   }
 
   try {
-    // Check if the email or username already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
+    // Fetch the user by ID
+    const userId = req.params.id;
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if email or username already exists (for a different user)
+    const duplicate = await User.findOne({
+      $or: [{ email }, { username }],
+      _id: { $ne: userId }, // Exclude the current user
+    });
+
+    if (duplicate) {
       return res.status(400).json({ message: 'Username or email already exists' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user object
-    const newUser = new User({
+    // Update fields
+    const updatedFields = {
       username,
       email,
-      password: hashedPassword,
-      profilePicture,
-      bio
+      bio,
+      updatedAt: new Date(), 
+    };
+
+    // If a new profile picture is uploaded, update it
+    if (profilePicture) {
+      updatedFields.profilePicture = profilePicture;
+    }
+
+    // If a new password is provided, hash it and update
+    if (password) {
+      updatedFields.password = await bcrypt.hash(password, 10);
+    }
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure validation rules are applied
     });
 
-    // Save the new user to the database
-    const savedUser = await newUser.save();
-
-    // Return the created user (excluding the password)
-    res.status(201).json({
-      message: 'User created successfully',
+    // Return the updated user (excluding the password)
+    res.status(200).json({
+      message: 'User updated successfully',
       user: {
-        username: savedUser.username,
-        email: savedUser.email,
-        profilePicture: savedUser.profilePicture,
-        bio: savedUser.bio,
-        createdAt: savedUser.createdAt,
-        updatedAt: savedUser.updatedAt
-      }
+        username: updatedUser.username,
+        email: updatedUser.email,
+        profilePicture: updatedUser.profilePicture,
+        bio: updatedUser.bio,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
+      },
     });
   } catch (error) {
     console.error(error);

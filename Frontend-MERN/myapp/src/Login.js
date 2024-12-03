@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate,Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -7,7 +8,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous errors
@@ -21,8 +22,10 @@ const Login = () => {
       // Store the token in session storage
       sessionStorage.setItem('token', token);
       
-      setMessage(`Welcome, ${user.username}!`);
+      setMessage(`Welcome Back, ${user.username}!`);
+      navigate('/dashboard');
     } catch (error) {
+      setMessage(``)
       if (error.response && error.response.data) {
         setError(error.response.data.message);
       } else {
@@ -81,6 +84,17 @@ const Login = () => {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           {message && <p className="text-green-500 text-sm mt-2">{message}</p>}
         </form>
+          <div className="mt-4 text-center">
+            <p className="text-sm">
+              Not a member?{" "}
+              <Link
+                to="/register"  // Use Link to navigate to Register page
+                className="text-indigo-500 hover:underline"
+              >
+                Register here
+              </Link>
+            </p>
+          </div>
       </div>
     </div>
   );
