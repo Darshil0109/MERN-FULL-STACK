@@ -11,5 +11,19 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.7"
-  }
+  },
+  "name": "backend-mern",
+  "version": "1.0.0",
+  "main": "multerConfig.js",
+  "devDependencies": {},
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
